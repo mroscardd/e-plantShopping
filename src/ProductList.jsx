@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './ProductList.css'
 import CartItem from './CartItem';
+import { addItem, removeItem, updateQuantity } from './CartSlice';
+
+
+
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
     const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
+    const [addedToCart, useAddedToCart] = useState({})
 
     const plantsArray = [
         {
@@ -252,6 +257,11 @@ function ProductList({ onHomeClick }) {
         e.preventDefault();
         setShowCart(false);
     };
+
+    const handleAddToCart = (plant) => {
+        dispatch(addItem(plant))
+        useAddedToCart((prev) => ({...prev, [plant.name]: true}))
+    }
     return (
         <div>
             <div className="navbar" style={styleObj}>
@@ -274,6 +284,25 @@ function ProductList({ onHomeClick }) {
             </div>
             {!showCart ? (
                 <div className="product-grid">
+                    {plantsArray.map((item, index) => (
+                        <div key={index}>
+                            <h2>{item.category}</h2>
+                            <div className="product-list">
+                            
+                            {item.plants.map((plant, plant_index) => (
+                                <div className="product-card" key={plant_index}>
+                                    <h3 className="product-title">{plant.name}</h3>
+                                    <img className="product-image" src={plant.image}/>
+                                    <h2 className="product-price">{plant.cost}</h2>
+                                    <button className="product-button" onClick={() => handleAddtoCart(plant)}>Add to Cart</button>
+                                </div>
+                            ))}
+                                
+                            </div>
+                        </div>
+
+                        
+                    ))}
 
 
                 </div>
