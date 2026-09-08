@@ -301,7 +301,7 @@ function ProductList({ onHomeClick }) {
                 <div className="product-grid">
                     {plantsArray.map((item, index) => (
                         <div key={index}>
-                            <h2>{item.category}</h2>
+                            <h2 className="plantname_heading">{item.category}</h2>
                             <div className="product-list">
                             {item.plants.map((plant, plant_index) => {
                                 const added = cart.find(item => item.name === plant.name)
