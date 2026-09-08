@@ -1,14 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import { useState} from 'react';
 import './ProductList.css'
 import CartItem from './CartItem';
-import { addItem, removeItem, updateQuantity } from './CartSlice';
+import { addItem, removeItem } from './CartSlice';
+import { useSelector, useDispatch } from 'react-redux';
+
 
 
 
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
     const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
-    const [addedToCart, useAddedToCart] = useState({})
+    const [addedToCart, setAddedToCart] = useState({})
+    const dispatch = useDispatch()
+    const cart = useSelector(state => state.cart.items)
+    const item_number = cart.reduce((total, item) => total + item.quantity, 0)
+    
+
 
     const plantsArray = [
         {
@@ -258,9 +265,17 @@ function ProductList({ onHomeClick }) {
         setShowCart(false);
     };
 
-    const handleAddToCart = (plant) => {
-        dispatch(addItem(plant))
-        useAddedToCart((prev) => ({...prev, [plant.name]: true}))
+    const handleAddtoCart = (plant) => {
+        const added = cart.find(item => item.name === plant.name)
+        if (added) {
+            dispatch(removeItem(plant))
+            setAddedToCart((prev) => ({...prev, [plant.name]: false}))
+        } else {
+            dispatch(addItem(plant))
+            setAddedToCart((prev) => ({...prev, [plant.name]: true}))
+        }
+
+    
     }
     return (
         <div>
@@ -279,7 +294,7 @@ function ProductList({ onHomeClick }) {
                 </div>
                 <div style={styleObjUl}>
                     <div> <a href="#" onClick={(e) => handlePlantsClick(e)} style={styleA}>Plants</a></div>
-                    <div> <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}><h1 className='cart'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68"><rect width="156" height="156" fill="none"></rect><circle cx="80" cy="216" r="12"></circle><circle cx="184" cy="216" r="12"></circle><path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" id="mainIconPathAttribute"></path></svg></h1></a></div>
+                    <div> <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}><p className="cart_quantity_count">{item_number != 0 ? item_number : 0 }</p><h1 className='cart'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68"><rect width="156" height="156" fill="none"></rect><circle cx="80" cy="216" r="12"></circle><circle cx="184" cy="216" r="12"></circle><path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" id="mainIconPathAttribute"></path></svg></h1></a></div>
                 </div>
             </div>
             {!showCart ? (
@@ -288,15 +303,24 @@ function ProductList({ onHomeClick }) {
                         <div key={index}>
                             <h2>{item.category}</h2>
                             <div className="product-list">
-                            
-                            {item.plants.map((plant, plant_index) => (
+                            {item.plants.map((plant, plant_index) => {
+                                const added = cart.find(item => item.name === plant.name)
+                            return (
                                 <div className="product-card" key={plant_index}>
                                     <h3 className="product-title">{plant.name}</h3>
                                     <img className="product-image" src={plant.image}/>
                                     <h2 className="product-price">{plant.cost}</h2>
-                                    <button className="product-button" onClick={() => handleAddtoCart(plant)}>Add to Cart</button>
+
+                                    <button 
+                                        className={`product-button ${added ? 'added-to-cart' : '' }`}
+                                        onClick={() => handleAddtoCart(plant)}
+                                        
+                                        >
+                                            {added ? 'Added to Cart' : 'Add to Cart'}
+                                        </button>
+                                        
                                 </div>
-                            ))}
+                            )})}
                                 
                             </div>
                         </div>

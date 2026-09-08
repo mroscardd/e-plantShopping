@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeItem, updateQuantity } from './CartSlice';
+import { addItem, removeItem, updateQuantity } from './CartSlice';
 import './CartItem.css';
 
 const CartItem = ({ onContinueShopping }) => {
@@ -9,28 +9,48 @@ const CartItem = ({ onContinueShopping }) => {
 
   // Calculate total amount for all products in the cart
   const calculateTotalAmount = () => {
- 
+  
+    const total = cart.reduce((total, item) => {
+      const cost = Number(item.cost.replace('$', ''))
+      return total + (cost * item.quantity)
+    }, 0)
+
+    return total
   };
 
   const handleContinueShopping = (e) => {
-   
+    onContinueShopping(e)
   };
 
+  const handleCheckoutShopping = (e) => {
+    alert('Functionality to be added for future reference');
+  };
 
 
   const handleIncrement = (item) => {
+    dispatch(updateQuantity({ name: item.name, quantity: item.quantity + 1 }))
   };
 
   const handleDecrement = (item) => {
-   
+    if (item.quantity > 1) {
+    dispatch(updateQuantity({ name: item.name, quantity: item.quantity - 1 }))
+    } else {
+      const assert = window.confirm('eliminardel carrito?')
+      if (assert) {
+        dispatch(removeItem(item))
+      }
+    }
   };
 
   const handleRemove = (item) => {
+    dispatch(removeItem(item))
   };
 
   // Calculate total cost based on quantity for an item
   const calculateTotalCost = (item) => {
-  };
+      const cost = Number(item.cost.replace('$', ''))
+      return (cost * item.quantity)
+    } 
 
   return (
     <div className="cart-container">
@@ -57,7 +77,7 @@ const CartItem = ({ onContinueShopping }) => {
       <div className="continue_shopping_btn">
         <button className="get-started-button" onClick={(e) => handleContinueShopping(e)}>Continue Shopping</button>
         <br />
-        <button className="get-started-button1">Checkout</button>
+        <button className="get-started-button1" onClick={(e) =>handleCheckoutShopping(e)}>Checkout</button>
       </div>
     </div>
   );
